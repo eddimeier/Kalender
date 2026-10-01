@@ -10,13 +10,16 @@
 
     <div class="excel-tabelle-container">
         
-        <!-- KOPFZEILE -->
+        <!-- KOPFZEILE (Alle IDs für die Live-Statistiken garantiert vorhanden) -->
         <div class="excel-header-row">
             <div class="kpi-box font-bold-box">
                 <span>Jahr: <span id="kpi-jahr">2026</span></span>
                 <button id="btn-export" class="btn-primary">💾 Liste.csv speichern</button>
             </div>
-            <div class="kpi-box">Monat aktuell: <span id="kpi-monat">-</span></div>
+            <div class="kpi-box font-bold-box">
+                <span>Monat: <span id="kpi-monat" style="font-weight: normal;">-</span></span>
+                <input type="date" id="kpi-startdatum-input" style="font-size: 11px; padding: 2px; border: 1px solid #d1d5db; border-radius: 3px;">
+            </div>
             <div class="kpi-box">Nettoarbeitstage: <span id="kpi-netto">0</span></div>
             <div class="kpi-box kpi-stunden-box">Stunden Nettoarbeitstage * 8,24: <span id="kpi-stunden">0h</span></div>
         </div>
@@ -24,10 +27,10 @@
         <!-- HAUPTBEREICH -->
         <div class="excel-main-layout">
             
-            <!-- LINKE SPALTE -->
+            <!-- LINKE SPALTE: Mitarbeiter & Konten -->
             <div id="mitarbeiter-linke-spalte" class="linke-spalte-bg"></div>
 
-            <!-- MITTLERE SPALTE -->
+            <!-- MITTLERE SPALTE: Kalenderkacheln -->
             <div class="mitte-layout">
                 <div class="wochen-grid weekday-header">
                     <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div class="weekend-text">Sa</div><div class="weekend-text">So</div>
@@ -35,7 +38,7 @@
                 <div id="kalender-mitte-raster" class="wochen-grid grid-content"></div>
             </div>
 
-            <!-- RECHTE SPALTE -->
+            <!-- RECHTE SPALTE: Quick-Infos -->
             <div id="excel-rechte-spalte" class="rechte-spalte-bg">
                 <div class="info-card">
                     <div class="card-title">Nächster Feiertag</div>
@@ -50,7 +53,7 @@
         </div>
     </div>
 
-    <!-- POP-UP MODAL -->
+    <!-- POP-UP MODAL FÜR BEARBEITUNG -->
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
