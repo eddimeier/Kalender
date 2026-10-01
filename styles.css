@@ -34,7 +34,7 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
 /* HAUPTLAYOUT: Zwingt die 3 Hauptspalten, stabil in einer Reihe zu bleiben */
 .excel-main-layout { 
     display: grid; 
-    grid-template-columns: 260px 1fr 260px; 
+    grid-template-columns: 220px 1fr 220px; 
     width: 100%; 
     min-width: 1300px; /* Garantiert, dass die Kacheln auf dem Tablet nicht schrumpfen */
 }
