@@ -22,17 +22,18 @@ let startDatum = new Date();
 
 function initialisiereDatum() {
     const heute = new Date();
-    const ersterDesMonats = new Date(heute.getFullYear(), heute.getMonth(), 1);
     
-    const wochentagErster = ersterDesMonats.getDay();
-    const diffZumMontag = ersterDesMonats.getDate() - wochentagErster + (wochentagErster === 0 ? -6 : 1);
+    // Berechne den Montag der AKTUELLEN Woche
+    const wochentagHeute = heute.getDay(); // 0 = Sonntag, 1 = Montag, ...
+    const diffZumMontag = (wochentagHeute === 0 ? -6 : 1 - wochentagHeute);
     
-    startDatum = new Date(ersterDesMonats.getFullYear(), ersterDesMonats.getMonth(), diffZumMontag); 
-    startDatum.setHours(0,0,0,0);
+    startDatum = new Date(heute.getFullYear(), heute.getMonth(), heute.getDate() + diffZumMontag); 
+    startDatum.setHours(0, 0, 0, 0);
     
-    let j = ersterDesMonats.getFullYear();
-    let m = String(ersterDesMonats.getMonth() + 1).padStart(2, '0');
-    let t = String(ersterDesMonats.getDate()).padStart(2, '0');
+    // Datumsfeld (Input) auf HEUTE setzen
+    let j = heute.getFullYear();
+    let m = String(heute.getMonth() + 1).padStart(2, '0');
+    let t = String(heute.getDate()).padStart(2, '0');
     
     const inputFeld = document.getElementById("kpi-startdatum-input");
     if (inputFeld) inputFeld.value = `${j}-${m}-${t}`;
