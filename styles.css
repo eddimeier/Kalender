@@ -34,7 +34,7 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
 /* HAUPTLAYOUT: Zwingt die 3 Hauptspalten, stabil in einer Reihe zu bleiben */
 .excel-main-layout { 
     display: grid; 
-    grid-template-columns: 190px 1fr 240px; 
+    grid-template-columns: 190px 1fr 200px; 
     width: 100%; 
     min-width: 1300px; /* Garantiert, dass die Kacheln auf dem Tablet nicht schrumpfen */
 }
@@ -52,7 +52,7 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
 
 /* LINKE SPALTE: Mitarbeiter-Konten (5 Zeilen à 48px = 240px) */
 .mitarbeiter-zeilen-block { height: 240px !important; border-bottom: 2px solid #bbf7d0; }
-.konto-zeile { height: 48px !important; display: flex; align-items: center; padding-left: 12px; border-bottom: 1px solid #e5e7eb; background-color: #ffffff; font-size: 18px !important; color: #27272a !important; font-weight: 600 !important; }
+.konto-zeile { height: 48px !important; display: flex; align-items: center; padding-left: 12px; border-bottom: 1px solid #e5e7eb; background-color: #ffffff; font-size: 15px !important; color: #27272a !important; font-weight: 600 !important; }
 .konto-zeile-header { font-weight: 800 !important; background-color: #e5e7eb; color: #000000 !important; border-right: 1px solid #d1d5db; font-size: 16px !important; }
 
 /* MITTLERES RASTER: Tages-Kacheln */
