@@ -36,14 +36,14 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
     display: grid; 
     grid-template-columns: 190px 1fr 200px; 
     width: 100%; 
-    min-width: 1400px; /* Garantiert, dass die Kacheln auf dem Tablet nicht schrumpfen */
+    min-width: 1150px; /* Garantiert, dass die Kacheln auf dem Tablet nicht schrumpfen */
 }
 
 .linke-spalte-bg { background-color: #f9fafb; border-right: 1px solid #d1d5db; display: flex; flex-direction: column; }
 .rechte-spalte-bg { background-color: #f9fafb; border-left: 1px solid #d1d5db; padding: 12px; display: flex; flex-direction: column; gap: 16px; }
 
-.mitte-layout { display: flex; flex-direction: column; width: 100%; justify-content: flex-start; }
-.wochen-grid { display: grid; grid-template-columns: repeat(7, minmax(110px, 1fr)); }
+.mitte-layout { display: flex; flex-direction: column; width: 100%; min-width: 0; justify-content: flex-start; }
+.wochen-grid { display: grid; grid-template-columns: repeat(7, minmax(95px, 1fr)); }
 
 /* WOCHENTAGE (Mo-So) */
 .weekday-header { background-color: #f3f4f6; border-bottom: 1px solid #d1d5db; font-weight: 800 !important; text-align: center; padding: 10px 0; color: #1f2937 !important; font-size: 18px !important; }
