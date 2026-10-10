@@ -1,6 +1,7 @@
 let gebuchteEintraege = [];
 let mitarbeiterListe = [];
 let feiertage = {}; 
+let schulferien = {};
 let ausgewähltesIsoDatum = null;
 
 const mitarbeiterFarben = {
@@ -183,7 +184,7 @@ function rendereSeitenInhalte() {
         let ferienNettoTage = 0;
         let krankTage = 0;
         let ueberzeitTage = 0;
-	let sonstigesTage = 0;
+        let sonstigesTage = 0;
 
         jahresEintraege.forEach(e => {
             let eDate = new Date(e.datumIso);
@@ -201,7 +202,11 @@ function rendereSeitenInhalte() {
             }
             if (e.typ === 'KR') krankTage++;
             if (e.typ === 'UZ') ueberzeitTage++;
-	    if (e.typ === 'SO') sonstigesTage++;
+            
+            // ---> HIER GEÄNDERT: Nur zählen, wenn kein Wochenende und kein Feiertag <---
+            if (e.typ === 'SO') {
+                if (!istWochenende && !istFeiertag) sonstigesTage++;
+            }
         });
 
         let block = document.createElement('div');
@@ -211,7 +216,7 @@ function rendereSeitenInhalte() {
             <div class="konto-zeile">Ferien ${ferienNettoTage} Tage</div>
             <div class="konto-zeile">Krank ${krankTage} Tage</div>
             <div class="konto-zeile">Überzeit ${ueberzeitTage} Tage</div>
-	    <div class="konto-zeile">sonstige ${sonstigesTage} Tage</div>
+            <div class="konto-zeile">sonstige ${sonstigesTage} Tage</div>
         `;
         linksSpalte.appendChild(block);
     });
@@ -230,12 +235,11 @@ function rendereSeitenInhalte() {
         feiertagKpi.innerText = feiertagAnzeige;
     }
 
+    // 1. ANSTEHENDE URLAUBE (Nur FE)
     const rechtsUrlaube = document.getElementById('rechts-urlaube-liste');
     if (rechtsUrlaube) {
         rechtsUrlaube.innerHTML = "";
-       let zukunftsUrlaube = gebuchteEintraege.filter(e => (e.typ === 'FE' || e.typ === 'SO') && new Date(e.datumIso) >= startDatum);
-
-        zukunftsUrlaube.sort((a, b) => a.datumIso.localeCompare(b.datumIso));
+        let zukunftsUrlaube = gebuchteEintraege.filter(e => e.typ === 'FE' && new Date(e.datumIso) >= startDatum);
         zukunftsUrlaube.sort((a, b) => a.datumIso.localeCompare(b.datumIso));
 
         if (zukunftsUrlaube.length === 0) {
@@ -259,6 +263,92 @@ function rendereSeitenInhalte() {
             });
         }
     }
+
+// 2. ANSTEHENDES SONSTIGES (Nur SO)
+    const rechtsSonstiges = document.getElementById('rechts-sonstiges-liste');
+    if (rechtsSonstiges) {
+        rechtsSonstiges.innerHTML = "";
+        let zukunftsSonstiges = gebuchteEintraege.filter(e => e.typ === 'SO' && new Date(e.datumIso) >= startDatum);
+        zukunftsSonstiges.sort((a, b) => a.datumIso.localeCompare(b.datumIso));
+
+        if (zukunftsSonstiges.length === 0) {
+            rechtsSonstiges.innerHTML = `<span style="color: #9ca3af; font-style: italic;">Keine Einträge im Zeitraum</span>`;
+        } else {
+            let gezeigteNamenSO = new Set();
+            let vorschauListeSO = [];
+            for (let u of zukunftsSonstiges) {
+                if (!gezeigteNamenSO.has(u.name.toLowerCase())) {
+                    gezeigteNamenSO.add(u.name.toLowerCase());
+                    vorschauListeSO.push(u);
+                }
+                if (vorschauListeSO.length >= 5) break;
+            }
+            vorschauListeSO.forEach(u => {
+                let d = new Date(u.datumIso);
+                let item = document.createElement('div');
+                item.className = "urlaub-item";
+                item.innerHTML = `<span>${u.name}</span><span class="datum">${d.getDate()}.${d.getMonth()+1}.</span>`;
+                rechtsSonstiges.appendChild(item);
+            });
+        }
+    }
+// 3. ANSTEHENDE SCHULFERIEN (FL)
+    const rechtsFerien = document.getElementById('rechts-Schulferien-liste');
+    if (rechtsFerien) {
+        rechtsFerien.innerHTML = "";
+        
+        // Filtert alle Ferientage heraus, die ab dem startDatum oder in der Zukunft liegen
+        let zukunftsFerienKeys = Object.keys(schulferien).filter(iso => new Date(iso) >= startDatum);
+        zukunftsFerienKeys.sort();
+
+        if (zukunftsFerienKeys.length === 0) {
+            rechtsFerien.innerHTML = `<span style="color: #9ca3af; font-style: italic;">Keine Schulferien im Zeitraum</span>`;
+        } else {
+            // Gruppiert zusammenhängende Ferientage, damit nicht jeder Einzeltag untereinander steht
+            let vorschauFerien = [];
+            let letzteFerienEnde = null;
+
+            // Wir wandeln das in eine übersichtliche Vorschau um
+            let ferienBloecke = [];
+            let aktuellerBlock = null;
+
+            for (let iso of zukunftsFerienKeys) {
+                let d = new Date(iso);
+                let text = schulferien[iso];
+
+                if (!aktuellerBlock) {
+                    aktuellerBlock = { start: d, ende: d, text: text };
+                } else {
+                    // Prüfen ob der Tag nahtlos anschließt und derselbe Text ist
+                    let letztesDatum = new Date(aktuellerBlock.ende);
+                    let diffTage = (d - letztesDatum) / (1000 * 60 * 60 * 24);
+
+                    if (diffTage === 1 && aktuellerBlock.text === text) {
+                        aktuellerBlock.ende = d;
+                    } else {
+                        ferienBloecke.push(aktuellerBlock);
+                        aktuellerBlock = { start: d, ende: d, text: text };
+                    }
+                }
+            }
+            if (aktuellerBlock) ferienBloecke.push(aktuellerBlock);
+
+            // Maximal die nächsten 4 Ferien-Blöcke anzeigen
+            let anzeigeBloecke = ferienBloecke.slice(0, 4);
+
+            anzeigeBloecke.forEach(b => {
+                let startStr = `${b.start.getDate()}.${b.start.getMonth()+1}.`;
+                let endeStr = `${b.ende.getDate()}.${b.ende.getMonth()+1}.`;
+                let datumsAnzeige = (startStr === endeStr) ? startStr : `${startStr} - ${endeStr}`;
+
+                let item = document.createElement('div');
+                item.className = "urlaub-item";
+                item.innerHTML = `<span>${b.text}</span><span class="datum">${datumsAnzeige}</span>`;
+                rechtsFerien.appendChild(item);
+            });
+        }
+    }
+
 }
 
 const modal = document.getElementById('edit-modal');
@@ -367,7 +457,6 @@ if (exportBtn) {
                 }
             }
             
-            // Saubere ISO-Datumsstrings für Excel generieren
             let fVon = `${startD.getFullYear()}-${String(startD.getMonth()+1).padStart(2,'0')}-${String(startD.getDate()).padStart(2,'0')}`;
             let fBis = `${endD.getFullYear()}-${String(endD.getMonth()+1).padStart(2,'0')}-${String(endD.getDate()).padStart(2,'0')}`;
             
@@ -384,38 +473,45 @@ if (exportBtn) {
     });
 }
 
-// KORREKTUR: Erkennt sowohl YYYY-MM-DD als auch D.M.YYYY und zwingt das Jahr auf das aktive Kalenderjahr (2026)
 function parseFlexiblesDatum(datumStr) {
     if (!datumStr) return null;
     let bereinigt = datumStr.trim();
-    let zielJahr = startDatum.getFullYear(); // 2026
+    let zielJahr = startDatum.getFullYear(); // 2026 als Fallback
 
-    // Variante A: Bindestrich-Format (ISO-Format)
+    // 1. ISO-Format YYYY-MM-DD direkt parsen (behält das echte Jahr bei, z.B. 2027!)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(bereinigt)) {
+        let d = new Date(bereinigt + "T00:00:00");
+        if (!isNaN(d)) return d;
+    }
+
+    // 2. Bindestrich-Format (z.B. Tag-Monat-Jahr oder umgekehrt)
     if (bereinigt.includes('-')) {
         let p = bereinigt.split('-');
         if (p.length === 3) {
             let tag = parseInt(p[2], 10);
             let monat = parseInt(p[1], 10) - 1;
-            // Falls das Jahr fälschlicherweise hinten stand, korrigieren wir das hier mit
+            let jahr = parseInt(p[0], 10);
             if (p[0].length === 2 || p[0].length === 1) {
                 tag = parseInt(p[0], 10);
                 jahr = zielJahr;
             }
-            if (!isNaN(tag) && !isNaN(monat)) {
-                return new Date(zielJahr, monat, tag);
-            }
+            return new Date(jahr, monat, tag);
         }
     }
 
-    // Variante B: Punkt-Format (Deutsches Format)
+    // 3. Deutsches Punkt-Format (z.B. DD.MM.YYYY oder DD.MM.)
     if (bereinigt.includes('.')) {
         let p = bereinigt.split('.');
-        if (p.length === 3) {
+        if (p.length >= 3 && p[2].trim() !== '') {
             let tag = parseInt(p[0], 10);
             let monat = parseInt(p[1], 10) - 1;
-            if (!isNaN(tag) && !isNaN(monat)) {
-                return new Date(zielJahr, monat, tag);
-            }
+            let jahr = parseInt(p[2], 10);
+            return new Date(jahr, monat, tag);
+        } else if (p.length >= 2) {
+            // Falls kein Jahr dabei steht, nimm das aktuelle Kalenderjahr
+            let tag = parseInt(p[0], 10);
+            let monat = parseInt(p[1], 10) - 1;
+            return new Date(zielJahr, monat, tag);
         }
     }
     return null;
@@ -423,23 +519,73 @@ function parseFlexiblesDatum(datumStr) {
 
 window.addEventListener('DOMContentLoaded', () => {
     feiertage = {}; 
+    schulferien = {};
     initialisiereDatum();
     
+    // 1. Feiertage laden (Daten.csv)
     fetch('Daten.csv')
         .then(res => { if (!res.ok) throw new Error(); return res.text(); })
         .then(datenText => {
-            const zeilen = datenText.split(/\r?\n/);
+            let bereinigterFeiertagText = datenText.replace(/^\uFEFF/, "");
+            const zeilen = bereinigterFeiertagText.split(/\r?\n/);
             for (let i = 1; i < zeilen.length; i++) {
                 let zeile = zeilen[i].trim();
                 if (!zeile) continue;
                 let spalten = zeile.includes(';') ? zeile.split(';') : zeile.split(',');
+                spalten = spalten.map(s => s.trim());
                 if (spalten.length >= 2) {
-                    let iso = spalten[0].trim();
-                    let n = spalten[1].trim();
+                    let iso = spalten[0];
+                    let n = spalten[1];
                     if(iso && n) feiertage[iso] = n;
                 }
             }
-            return fetch('Liste.csv');
+// 2. Schulferien laden (FerienFL.csv) - Robust und fehlertolerant
+return fetch('FerienFL.csv').catch(() => null);
+})
+.then(res => res ? res.text() : "")
+.then(ferienText => {
+    if (!ferienText) return fetch('Liste.csv');
+    
+    // BOM entfernen und Zeilen aufteilen
+    let bereinigterFerienText = ferienText.replace(/^\uFEFF/, "");
+    const zeilen = bereinigterFerienText.split(/\r?\n/);
+    
+    for (let i = 1; i < zeilen.length; i++) {
+        let zeile = zeilen[i].trim();
+        if (!zeile) continue;
+        
+        // Erkennt automatisch Komma oder Strichpunkt als Trennzeichen
+        let spalten = zeile.includes(';') ? zeile.split(';') : zeile.split(',');
+        spalten = spalten.map(s => s.trim().replace(/^["']|["']$/g, ''));
+        
+        if (spalten.length >= 3) {
+            let vonStr = spalten[0];
+            let bisStr = spalten[1];
+            let text = spalten[2]; 
+            
+            let vonDate = parseFlexiblesDatum(vonStr);
+            let bisDate = parseFlexiblesDatum(bisStr);
+            
+            if (vonDate && bisDate) {
+                let loopDate = new Date(vonDate);
+                while (loopDate <= bisDate) {
+                    let j = loopDate.getFullYear();
+                    let m = String(loopDate.getMonth() + 1).padStart(2, '0');
+                    let t = String(loopDate.getDate()).padStart(2, '0');
+                    let iso = `${j}-${m}-${t}`;
+                    
+                    schulferien[iso] = text; 
+                    loopDate.setDate(loopDate.getDate() + 1);
+                }
+            }
+        }
+    }
+    
+    // Debug-Check in der Browser-Konsole (Drücke F12 im Browser)
+    console.log("Geladene Ferientage gesamt:", Object.keys(schulferien).length);
+
+    // 3. Mitarbeiter-Liste / Buchungen laden (Liste.csv)
+    return fetch('Liste.csv');
         })
         .then(res => res.text())
         .then(listeText => {
@@ -453,7 +599,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (!zeile) continue;
                 
                 let spalten = zeile.includes(';') ? zeile.split(';') : zeile.split(',');
-                spalten = spalten.map(s => s.trim()).filter(s => s !== "");
+                spalten = spalten.map(s => s.trim());
                 
                 if (spalten.length >= 4) {
                     let typ = spalten[0].toUpperCase();
@@ -482,7 +628,8 @@ window.addEventListener('DOMContentLoaded', () => {
             mitarbeiterListe = Array.from(namenSet).sort((a,b) => a.localeCompare(b));
             rendereGesamtSystem();
         })
-        .catch(() => {
+        .catch(err => {
+            console.error("Fehler beim Laden der CSV-Dateien:", err);
             rendereGesamtSystem();
         });
 });
