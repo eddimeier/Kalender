@@ -36,7 +36,7 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
     display: grid; 
     grid-template-columns: 190px 1fr 200px; 
     width: 100%; 
-    min-width: 1300px; /* Garantiert, dass die Kacheln auf dem Tablet nicht schrumpfen */
+    min-width: 1400px; /* Garantiert, dass die Kacheln auf dem Tablet nicht schrumpfen */
 }
 
 .linke-spalte-bg { background-color: #f9fafb; border-right: 1px solid #d1d5db; display: flex; flex-direction: column; }
@@ -68,7 +68,7 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
 .bg-feiertag { background-color: #fef08a !important; cursor: not-allowed; }
 
 /* NAMENS-BADGES IM KALENDER */
-.badge { padding: 3px 6px; border-radius: 2px; font-weight: 800 !important; font-size: 14px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; border-left: 3px solid transparent; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+.badge { padding: 3px 6px; border-radius: 2px; font-weight: 800 !important; font-size: 12px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; border-left: 3px solid transparent; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
 
 /* RECHTE SPALTE INFO-ELEMENTE */
 .info-card { background-color: #ffffff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 4px; }
