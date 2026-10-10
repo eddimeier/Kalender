@@ -89,7 +89,7 @@ function rendereGesamtSystem() {
         
         let istFT = feiertage[pruefIso] ? true : false;
         
-        // Zähle nur Tage von Montag bis Freitag, die keine Feiertage in Daten.csv sind
+        // Zähle nur Tage von Montag bis Freitag, die keine Feiertage sind
         if (wochentagIdx !== 0 && wochentagIdx !== 6 && !istFT) {
             nettoTageVollerMonat++;
         }
@@ -111,11 +111,18 @@ function rendereGesamtSystem() {
         
         let istWE = (wochentagIndex === 0 || wochentagIndex === 6);
         let istFT = feiertage[isoDate] ? true : false;
+        let ferienText = schulferien[isoDate]; // Holt den Text aus FerienFL.csv
+        let istFerien = ferienText ? true : false;
 
         let kachel = document.createElement('div');
         kachel.className = "kalender-tag-kachel";
-        if (istWE) kachel.classList.add('bg-wochenende');
-        if (istFT) kachel.classList.add('bg-feiertag');
+        if (istFT) {
+            kachel.classList.add('bg-feiertag');
+        } else if (istWE) {
+            kachel.classList.add('bg-wochenende');
+        } else if (istFerien) {
+            kachel.classList.add('bg-schulferien'); // <--- Hier greift die Pastellfarbe für Schulferien
+        }
 
         if (!istFT) {
             kachel.addEventListener('click', () => öffneEditor(isoDate, aktDatum));
@@ -124,7 +131,13 @@ function rendereGesamtSystem() {
         let dHeader = document.createElement('div');
         dHeader.className = "kachel-header";
         dHeader.innerHTML = `<span>${tag}. ${monat}</span>`;
-        if (istFT) dHeader.innerHTML += `<span class="feiertag-label" title="${feiertage[isoDate]}">${feiertage[isoDate]}</span>`;
+        
+        if (istFT) {
+            dHeader.innerHTML += `<span class="feiertag-label" title="${feiertage[isoDate]}">${feiertage[isoDate]}</span>`;
+        } else if (istFerien) {
+            dHeader.innerHTML += `<span class="ferien-label" title="${ferienText}">${ferienText}</span>`; // <--- Zeigt das Ferien-Label im Kopf an
+        }
+        
         kachel.appendChild(dHeader);
 
         let eContainer = document.createElement('div');
@@ -146,7 +159,7 @@ function rendereGesamtSystem() {
             let symbol = "🌴 "; 
             if (eintrag.typ === 'KR') symbol = "🤒 "; 
             if (eintrag.typ === 'UZ') symbol = "⏳ "; 
-	        if (eintrag.typ === 'SO') symbol = "❓ ";
+            if (eintrag.typ === 'SO') symbol = "❓ ";
 
             b.innerText = `${symbol}${eintrag.name}`;
             eContainer.appendChild(b);
