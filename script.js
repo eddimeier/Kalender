@@ -145,6 +145,7 @@ function rendereGesamtSystem() {
             let symbol = "🌴 "; 
             if (eintrag.typ === 'KR') symbol = "🤒 "; 
             if (eintrag.typ === 'UZ') symbol = "⏳ "; 
+	    if (eintrag.typ === 'SO') symbol = "❓ ";
 
             b.innerText = `${symbol}${eintrag.name}`;
             eContainer.appendChild(b);
@@ -199,6 +200,7 @@ function rendereSeitenInhalte() {
             }
             if (e.typ === 'KR') krankTage++;
             if (e.typ === 'UZ') ueberzeitTage++;
+	    if (e.typ === 'SO') sonstigeTage++;
         });
 
         let block = document.createElement('div');
@@ -208,6 +210,7 @@ function rendereSeitenInhalte() {
             <div class="konto-zeile">Ferien ${ferienNettoTage} Tage</div>
             <div class="konto-zeile">Krank ${krankTage} Tage</div>
             <div class="konto-zeile">Überzeit ${ueberzeitTage} Tage</div>
+	    <div class="konto-zeile">sonstige ${ueberzeitTage} Tage</div>
         `;
         linksSpalte.appendChild(block);
     });
