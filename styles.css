@@ -43,7 +43,7 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
 .rechte-spalte-bg { background-color: #f9fafb; border-left: 1px solid #d1d5db; padding: 12px; display: flex; flex-direction: column; gap: 16px; }
 
 .mitte-layout { display: flex; flex-direction: column; width: 100%; justify-content: flex-start; }
-.wochen-grid { display: grid; grid-template-columns: repeat(7, minmax(95px, 1fr)); }
+.wochen-grid { display: grid; grid-template-columns: repeat(7, minmax(110px, 1fr)); }
 
 /* WOCHENTAGE (Mo-So) */
 .weekday-header { background-color: #f3f4f6; border-bottom: 1px solid #d1d5db; font-weight: 800 !important; text-align: center; padding: 10px 0; color: #1f2937 !important; font-size: 18px !important; }
