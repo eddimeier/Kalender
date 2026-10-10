@@ -183,6 +183,7 @@ function rendereSeitenInhalte() {
         let ferienNettoTage = 0;
         let krankTage = 0;
         let ueberzeitTage = 0;
+	let sonstigeTage = 0;
 
         jahresEintraege.forEach(e => {
             let eDate = new Date(e.datumIso);
@@ -210,7 +211,7 @@ function rendereSeitenInhalte() {
             <div class="konto-zeile">Ferien ${ferienNettoTage} Tage</div>
             <div class="konto-zeile">Krank ${krankTage} Tage</div>
             <div class="konto-zeile">Überzeit ${ueberzeitTage} Tage</div>
-	    <div class="konto-zeile">sonstige ${ueberzeitTage} Tage</div>
+	    <div class="konto-zeile">sonstige ${sonstigeTage} Tage</div>
         `;
         linksSpalte.appendChild(block);
     });
