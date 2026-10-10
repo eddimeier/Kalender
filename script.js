@@ -145,7 +145,7 @@ function rendereGesamtSystem() {
             let symbol = "🌴 "; 
             if (eintrag.typ === 'KR') symbol = "🤒 "; 
             if (eintrag.typ === 'UZ') symbol = "⏳ "; 
-	    if (eintrag.typ === 'SO') symbol = "❓ ";
+	        if (eintrag.typ === 'SO') symbol = "❓ ";
 
             b.innerText = `${symbol}${eintrag.name}`;
             eContainer.appendChild(b);
@@ -183,7 +183,7 @@ function rendereSeitenInhalte() {
         let ferienNettoTage = 0;
         let krankTage = 0;
         let ueberzeitTage = 0;
-	let sonstigeTage = 0;
+	let sonstigesTage = 0;
 
         jahresEintraege.forEach(e => {
             let eDate = new Date(e.datumIso);
@@ -201,7 +201,7 @@ function rendereSeitenInhalte() {
             }
             if (e.typ === 'KR') krankTage++;
             if (e.typ === 'UZ') ueberzeitTage++;
-	    if (e.typ === 'SO') sonstigeTage++;
+	    if (e.typ === 'SO') sonstigesTage++;
         });
 
         let block = document.createElement('div');
@@ -211,7 +211,7 @@ function rendereSeitenInhalte() {
             <div class="konto-zeile">Ferien ${ferienNettoTage} Tage</div>
             <div class="konto-zeile">Krank ${krankTage} Tage</div>
             <div class="konto-zeile">Überzeit ${ueberzeitTage} Tage</div>
-	    <div class="konto-zeile">sonstige ${sonstigeTage} Tage</div>
+	    <div class="konto-zeile">sonstige ${sonstigesTage} Tage</div>
         `;
         linksSpalte.appendChild(block);
     });
@@ -233,7 +233,9 @@ function rendereSeitenInhalte() {
     const rechtsUrlaube = document.getElementById('rechts-urlaube-liste');
     if (rechtsUrlaube) {
         rechtsUrlaube.innerHTML = "";
-        let zukunftsUrlaube = gebuchteEintraege.filter(e => e.typ === 'FE' && new Date(e.datumIso) >= startDatum);
+       let zukunftsUrlaube = gebuchteEintraege.filter(e => (e.typ === 'FE' || e.typ === 'SO') && new Date(e.datumIso) >= startDatum);
+
+        zukunftsUrlaube.sort((a, b) => a.datumIso.localeCompare(b.datumIso));
         zukunftsUrlaube.sort((a, b) => a.datumIso.localeCompare(b.datumIso));
 
         if (zukunftsUrlaube.length === 0) {
