@@ -57,7 +57,28 @@ body { background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont
 
 /* MITTLERES RASTER: Tages-Kacheln */
 .kalender-tag-kachel { height: 240px !important; border-right: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; padding: 6px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; }
-.kalender-tag-kachel:hover { background-color: #f8fafc; }
+/* GRUNDLAGEN FÜR DEN HOVER-SCHLEIER */
+.kalender-tag-kachel {
+    position: relative; /* Wichtig, damit das Overlay perfekt auf der Kachel liegt */
+}
+
+/* Erzeugt ein zartes Overlay beim Drüberfahren, das für JEDE Kachel gilt (egal welche Farbe sie hat) */
+.kalender-tag-kachel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: transparent;
+    pointer-events: none; /* Klicks gehen problemlos durch */
+    transition: background-color 0.15s ease;
+}
+
+/* Wenn die Maus über irgendeine Kachel fährt, legt sich ein dezenter Schleier darüber */
+.kalender-tag-kachel:hover::after {
+    background-color: rgba(0, 0, 0, 0.04); /* Macht die Kachel beim Hover hauchdünn dunkler */
+}
 
 /* DATUMSZAHLEN IN DEN KACHELN */
 .kachel-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800 !important; color: #1f2937 !important; border-bottom: 1px solid #f3f4f6; padding-bottom: 4px; margin-bottom: 6px; font-size: 15px !important; }
